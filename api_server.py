@@ -83,7 +83,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     engine_args = AsyncEngineArgs(model="mock")
-    engine = AsyncLLMEngine.from_engine_args(engine_args)
+    engine = AsyncLLMEngine.from_engine_args(
+        engine_args,
+        cache_prompts_path='medium-5k.json'
+    )
 
     app.root_path = ''
     uvicorn.run(app,

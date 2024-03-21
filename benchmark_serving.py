@@ -132,8 +132,9 @@ def sample_requests(
                 data["conversations"][1]["value"]) for data in dataset]
 
     # some of these will be filtered out, so sample more than we need
-    sampled_indices = random.sample(range(len(dataset)),
-                                    int(num_requests * 1.2))
+    # sampled_indices = random.sample(range(len(dataset)),
+    #                                 int(num_requests * 1.2))
+    sampled_indices = list(range(int(num_requests * 1.2)))  # new changes
     dataset = [dataset[i] for i in sampled_indices]
 
     # Tokenize the prompts and completions.
@@ -161,7 +162,8 @@ def sample_requests(
         filtered_dataset.append((prompt, prompt_len, output_len))
 
     # Sample the requests.
-    sampled_requests = random.sample(filtered_dataset, num_requests)
+    # sampled_requests = random.sample(filtered_dataset, num_requests)
+    sampled_requests = filtered_dataset[:num_requests]  # new changes
     return sampled_requests
 
 

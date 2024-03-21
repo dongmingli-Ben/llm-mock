@@ -2,9 +2,10 @@
 
 from dataclasses import dataclass
 from typing import List, Optional
-from config import BATCH_SIZE
+from config import BATCH_SIZE, USE_CACHE, MAX_CACHE_TOKEN_SIZE
 from sampling_params import SamplingParams
 from utils import CompletionOutput
+from cache import NoCache, PrefixTreeCache, PromptCacheBase
 from copy import deepcopy
 
 @dataclass
@@ -25,9 +26,13 @@ class SchedulerTask:
 
 class Scheduler:
 
-    def __init__(self, batch_size: int = BATCH_SIZE):
+    def __init__(self, batch_size: int = BATCH_SIZE, cache_prompts: List[List[int]] = None):
         self.task_pool: List[SchedulerTask] = []
         self.batch_size = batch_size
+        self.cache: PromptCacheBase = PrefixTreeCache(MAX_CACHE_TOKEN_SIZE) \
+            if USE_CACHE else NoCache()
+        if cache_prompts:
+            self.cache.populate(cache_prompts)
 
     def add_request(self, 
                     request_id: str, 
@@ -36,6 +41,8 @@ class Scheduler:
                     sampling_params: Optional[SamplingParams] = None,
                     arrival_time: float = 0.0):
         """Add a request to the scheduler"""
+        first_new_token_idx = self.cache.query_first_different_token_idx(prompt_token_ids)
+        print(f"NEW REQUEST: first new token index: {first_new_token_idx}")
         task = SchedulerTask(
             request_id=request_id,
             prompt=prompt,
@@ -43,7 +50,7 @@ class Scheduler:
             sampling_params=sampling_params,
             arrival_time=arrival_time,
             token_ids=prompt_token_ids.copy(),
-            first_new_token_idx=0,
+            first_new_token_idx=first_new_token_idx,
             output=CompletionOutput(
                 index=0,
                 text="",

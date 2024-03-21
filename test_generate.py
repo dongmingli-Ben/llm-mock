@@ -42,7 +42,10 @@ async def generate(request_dict):
 if __name__ == "__main__":
 
     engine_args = AsyncEngineArgs(model="mock")
-    engine = AsyncLLMEngine.from_engine_args(engine_args)
+    engine = AsyncLLMEngine.from_engine_args(
+        engine_args,
+        cache_prompts_path='medium-5k.json'
+    )
 
     payload = {
             "prompt": "this is a prompt",
