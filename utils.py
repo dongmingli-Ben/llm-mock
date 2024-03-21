@@ -2,7 +2,6 @@ import uuid
 from dataclasses import dataclass
 from typing import Optional, List
 
-DECODE_LENGTH = 10
 
 def random_uuid() -> str:
     return str(uuid.uuid4().hex)

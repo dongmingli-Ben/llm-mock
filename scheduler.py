@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from typing import List, Optional
+from config import BATCH_SIZE
 from sampling_params import SamplingParams
 from utils import CompletionOutput
 from copy import deepcopy
@@ -24,7 +25,7 @@ class SchedulerTask:
 
 class Scheduler:
 
-    def __init__(self, batch_size: int = 10):
+    def __init__(self, batch_size: int = BATCH_SIZE):
         self.task_pool: List[SchedulerTask] = []
         self.batch_size = batch_size
 
