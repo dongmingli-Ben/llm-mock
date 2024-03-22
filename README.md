@@ -56,3 +56,12 @@ When a new prompt comes, the scheduler queries the cache for the common prefix, 
 Left: request throughput and matched prefix length with respect to the `CACHE_SIZE`; Right: 99% TTFT and 99% TPOT latency with respect to the `CACHE_SIZE`.
 
 The improvement of the prefix cache is minimum, this is because the matched prefix length is small (~1.5 tokens).The TTFT latency decreases because now the sequence length to be computed decreases by around 1 token. The TPOT latency also decreases because in some batches, decodes are mixed with prefills. This batch has a significantly larger runtime than a pure decode batch. By reducing compute by 1 token, the decode time decreases.
+
+### Effect of Batch Size
+
+![image](./assets/batch.png)
+
+Left: the 99% TTFT latency and the improvement of 99% TTFT latency compared with no caching with respect to the `CACHE_SIZE`; Right: the 99% TPOT latency and the improvement of 99% TPOT latency compared with no caching with respect to the `CACHE_SIZE`.
+
+The TTFT and TPOT both decrease with higher batch sizes. This is because for the simple FCFS scheduler, a larger batch means more chances to mix prefills with decodes, which wastes a large amount of computation.
+The improvement of the prefix cache is also more significant with lower batch sizes. This may be because with a larger batch size, the TPOT is larger for the no-cache baseline. Although the prefix cache reduces the runtime of mixed batches by 1~2 tokens, this improvement is insignificant compared to the larger baseline.
