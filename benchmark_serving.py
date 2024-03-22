@@ -197,7 +197,7 @@ def calculate_metrics(
     ttfts = []
     for i in range(len(outputs)):
         if outputs[i].success:
-            output_len = len(tokenizer.encode(outputs[i].generated_text))
+            output_len = len(tokenizer.encode(outputs[i].generated_text))  # should not use tokenizer here, instead split by space. But not a big deal.
             total_output += output_len
             total_input += input_requests[i][1]
             per_token_latencies.append(outputs[i].latency / output_len)
