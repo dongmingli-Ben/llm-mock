@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from typing import List, Optional
-from config import BATCH_SIZE, USE_CACHE, MAX_CACHE_TOKEN_SIZE
+from config import BATCH_SIZE, USE_CACHE, MAX_CACHE_TOKEN_SIZE, decode_length
 from sampling_params import SamplingParams
 from utils import CompletionOutput
 from cache import NoCache, PrefixTreeCache, PromptCacheBase
@@ -22,6 +22,8 @@ class SchedulerTask:
 
     output: CompletionOutput = None
     """This field is meant to make the step function easier."""
+    decode_length: int = 0
+    """The length of the decoded sequence."""
 
 
 class Scheduler:
@@ -42,7 +44,6 @@ class Scheduler:
                     arrival_time: float = 0.0):
         """Add a request to the scheduler"""
         first_new_token_idx = self.cache.query_first_different_token_idx(prompt_token_ids)
-        print(f"NEW REQUEST: first new token index: {first_new_token_idx}")
         task = SchedulerTask(
             request_id=request_id,
             prompt=prompt,
@@ -51,6 +52,7 @@ class Scheduler:
             arrival_time=arrival_time,
             token_ids=prompt_token_ids.copy(),
             first_new_token_idx=first_new_token_idx,
+            decode_length=decode_length(len(prompt_token_ids)),
             output=CompletionOutput(
                 index=0,
                 text="",
@@ -58,6 +60,7 @@ class Scheduler:
                 finish_reason=None
             )
         )
+        print(f"NEW REQUEST: first new token index: {first_new_token_idx}, decode length: {task.decode_length}")
         self.task_pool.append(task)
 
     def schedule(self) -> List[SchedulerTask]:

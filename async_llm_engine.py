@@ -10,7 +10,6 @@ from transformers import PreTrainedTokenizer, GPT2Tokenizer
 from cache import encode_prompts_from_file
 from mock import mock_execute_model_async
 from utils import AsyncEngineArgs, RequestOutput, CompletionOutput
-from config import random_decode_length
 # from vllm.engine.llm_engine import LLMEngine
 from logger import init_logger
 from sampling_params import SamplingParams
@@ -225,7 +224,7 @@ class _AsyncLLMEngine:
         request_outputs = []
         for task in tasks:
             token_id = len(task.output.token_ids)
-            finish = token_id >= random_decode_length()
+            finish = token_id >= task.decode_length
             output = self.scheduler.update_request_decode(
                 task.request_id, token_id, finish)
             request_outputs.append(
